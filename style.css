@@ -316,3 +316,61 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
   .cursor.hover::before { left: -18px; width: 36px; }
   .cursor.hover::after  { top: -18px; height: 36px; }
 }
+
+/* visionneuse plein écran : fond noir opaque, zoom + déplacement */
+.lb {
+  position: fixed; inset: 0; z-index: 60;
+  background: #000; color: #fff;
+  opacity: 0; visibility: hidden;
+  transition: opacity .35s ease, visibility 0s linear .35s;
+}
+.lb.open { opacity: 1; visibility: visible; transition: opacity .35s ease, visibility 0s; }
+.lb__stage {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  overflow: hidden;
+  touch-action: none;
+}
+.lb__stage img {
+  max-width: 92vw; max-height: 82svh;
+  object-fit: contain;
+  user-select: none; -webkit-user-drag: none;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  transition: opacity .25s;
+}
+.lb__stage img.smooth { transition: transform .25s ease, opacity .25s; }
+.lb__stage img.loading { opacity: 0; }
+.lb__top {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 2;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: var(--pad);
+  pointer-events: none;
+}
+.lb__top > * { pointer-events: auto; }
+.lb__btn {
+  background: none; border: 0; color: #fff; cursor: pointer;
+  padding: 10px; min-width: 44px; min-height: 44px;
+  transition: opacity .2s;
+}
+.lb__btn:hover { opacity: .55; }
+.lb__top .lb__btn { margin: -10px -10px 0 0; }
+.lb__nav {
+  position: absolute; top: 50%; z-index: 2;
+  transform: translateY(-50%);
+  font-size: 1.6em;
+}
+.lb__nav--prev { left: var(--pad); }
+.lb__nav--next { right: var(--pad); }
+.lb__zoom {
+  position: absolute; bottom: var(--pad); left: 50%; z-index: 2;
+  transform: translateX(-50%);
+  display: flex; gap: 6px;
+}
+.slide.is-active { cursor: zoom-in; }
+@media (max-width: 720px) {
+  .lb__nav { top: auto; bottom: var(--pad); transform: none; }
+  .lb__nav--prev { left: var(--pad); }
+  .lb__nav--next { right: var(--pad); }
+  .lb__stage img { max-height: 76svh; }
+}

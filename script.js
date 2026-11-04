@@ -25,7 +25,10 @@ images.forEach((im, i) => {
   li.innerHTML = im.img
     ? `<img src="${im.img}" alt="${p.title}" draggable="false">`
     : `<span class="ph">${pad(i + 1)}</span>`;
-  li.addEventListener("click", () => { if (!moved) go(i); });
+  li.addEventListener("click", () => {
+    if (moved) return;
+    if (i === active && view === "list") openLB(i); else go(i); // photo active → plein écran
+  });
   track.appendChild(li);
 });
 const slides = [...track.children];
@@ -151,6 +154,7 @@ function ping(el) {
 const AUTO_MS = 5000; // délai entre deux slides (défilement lent)
 let timer = null;
 let view = "list";
+let lbOpen = false; // visionneuse ouverte → carrousel à l'arrêt
 
 function go(i) {
   const n = images.length;
@@ -165,14 +169,14 @@ function go(i) {
 
 function restartAuto() {
   clearInterval(timer);
-  if (document.hidden) return;
+  if (document.hidden || lbOpen) return;
   timer = setInterval(() => go(active + 1), AUTO_MS);
 }
 document.addEventListener("visibilitychange", restartAuto);
 
 // clavier
 addEventListener("keydown", e => {
-  if (view === "gallery") return;
+  if (view === "gallery" || lbOpen) return;
   if (e.key === "ArrowRight" || e.key === "ArrowDown") go(active + 1);
   if (e.key === "ArrowLeft" || e.key === "ArrowUp") go(active - 1);
 });
@@ -183,7 +187,7 @@ $("prev").onclick = () => go(active - 1);
 let lock = false;
 addEventListener("wheel", e => {
   e.preventDefault();
-  if (lock || view === "gallery") return;
+  if (lock || view === "gallery" || lbOpen) return;
   const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
   if (Math.abs(d) < 8) return;
   lock = true;
@@ -217,6 +221,146 @@ $("num").textContent = `${pad(1)}/${pad(images.length)}`;
 $("title").textContent = projects[0].title;
 $("cat").textContent = projects[0].cat;
 $("year").textContent = projects[0].year;
+
+// ---------- visionneuse plein écran ----------
+const lb = $("lb"), lbStage = $("lbStage"), lbImg = $("lbImg");
+let lbIdx = 0, s = 1, tx = 0, ty = 0;
+const MAXZ = 6;
+const clampN = (v, a, b) => Math.min(b, Math.max(a, v));
+
+function lbApply() {
+  lbImg.style.transform = `translate(${tx}px,${ty}px) scale(${s})`;
+}
+function lbClamp() {
+  const mx = Math.max(0, (lbImg.offsetWidth * s - lbStage.clientWidth) / 2);
+  const my = Math.max(0, (lbImg.offsetHeight * s - lbStage.clientHeight) / 2);
+  tx = clampN(tx, -mx, mx);
+  ty = clampN(ty, -my, my);
+  if (s <= 1) { tx = 0; ty = 0; }
+}
+// zoom autour d'un point de l'écran (cx, cy)
+function lbZoom(ns, cx, cy, smooth = false) {
+  ns = clampN(ns, 1, MAXZ);
+  const r = lbStage.getBoundingClientRect();
+  const px = cx - (r.left + r.width / 2), py = cy - (r.top + r.height / 2);
+  const k = ns / s;
+  tx = px - (px - tx) * k;
+  ty = py - (py - ty) * k;
+  s = ns;
+  lbClamp();
+  if (smooth) { lbImg.classList.add("smooth"); setTimeout(() => lbImg.classList.remove("smooth"), 280); }
+  lbApply();
+}
+const lbCenter = () => { const r = lbStage.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+
+function lbLoad() {
+  const im = images[lbIdx];
+  s = 1; tx = 0; ty = 0; lbApply();
+  lbImg.classList.add("loading");
+  lbImg.onload = () => lbImg.classList.remove("loading");
+  lbImg.src = im.img;
+  lbImg.alt = projects[im.p].title;
+  $("lbCount").textContent = `${projects[im.p].title} — ${pad(lbIdx + 1)}/${pad(images.length)}`;
+  const next = new Image(); next.src = images[(lbIdx + 1) % images.length].img; // précharge
+}
+function lbNav(d) {
+  lbIdx = (lbIdx + d + images.length) % images.length;
+  lbLoad();
+}
+function openLB(i) {
+  lbOpen = true;
+  clearInterval(timer);
+  lbIdx = i;
+  lbLoad();
+  lb.classList.add("open");
+  lb.setAttribute("aria-hidden", "false");
+}
+function closeLB() {
+  if (!lbOpen) return;
+  lbOpen = false;
+  lb.classList.remove("open");
+  lb.setAttribute("aria-hidden", "true");
+  if (lbIdx !== active) go(lbIdx); else restartAuto(); // le carrousel suit la dernière image vue
+}
+
+$("lbClose").onclick = closeLB;
+$("lbPrev").onclick = () => lbNav(-1);
+$("lbNext").onclick = () => lbNav(1);
+$("lbIn").onclick = () => lbZoom(s * 1.6, ...lbCenter(), true);
+$("lbOut").onclick = () => lbZoom(s / 1.6, ...lbCenter(), true);
+$("lbReset").onclick = () => lbZoom(1, ...lbCenter(), true);
+
+// molette = zoom
+lbStage.addEventListener("wheel", e => {
+  e.preventDefault();
+  lbZoom(s * Math.exp(-e.deltaY * 0.0018), e.clientX, e.clientY);
+}, { passive: false });
+
+// clavier
+addEventListener("keydown", e => {
+  if (!lbOpen) return;
+  if (e.key === "Escape") closeLB();
+  else if (e.key === "ArrowRight") lbNav(1);
+  else if (e.key === "ArrowLeft") lbNav(-1);
+  else if (e.key === "+" || e.key === "=") lbZoom(s * 1.4, ...lbCenter(), true);
+  else if (e.key === "-") lbZoom(s / 1.4, ...lbCenter(), true);
+  else if (e.key === "0") lbZoom(1, ...lbCenter(), true);
+});
+
+// souris / doigts : déplacer (zoomé), balayer (non zoomé), pincer, double-tap
+const pts = new Map();
+let g = null, pinch = null, pinched = false, lastTap = { t: 0, x: 0, y: 0 };
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+lbStage.addEventListener("pointerdown", e => {
+  lbStage.setPointerCapture(e.pointerId);
+  pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pts.size === 2) {
+    const [a, b] = [...pts.values()];
+    pinch = { d: dist(a, b), s };
+    pinched = true;
+  }
+  g = { x: e.clientX, y: e.clientY, tx, ty, t: Date.now() };
+});
+lbStage.addEventListener("pointermove", e => {
+  if (!pts.has(e.pointerId)) return;
+  pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pts.size === 2 && pinch) {
+    const [a, b] = [...pts.values()];
+    lbZoom(pinch.s * (dist(a, b) / pinch.d), (a.x + b.x) / 2, (a.y + b.y) / 2);
+  } else if (pts.size === 1 && s > 1 && g) {
+    tx = g.tx + (e.clientX - g.x);
+    ty = g.ty + (e.clientY - g.y);
+    lbClamp(); lbApply();
+  }
+});
+const lbUp = e => {
+  if (!pts.has(e.pointerId)) return;
+  pts.delete(e.pointerId);
+  if (pts.size === 1) { const p = [...pts.values()][0]; g = { x: p.x, y: p.y, tx, ty, t: Date.now() }; }
+  if (pts.size > 0) return;
+  pinch = null;
+  if (pinched) { pinched = false; g = null; return; }
+  if (!g) return;
+  const dx = e.clientX - g.x, dy = e.clientY - g.y;
+  const tap = Math.hypot(dx, dy) < 8 && Date.now() - g.t < 400;
+  if (s <= 1 && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    lbNav(dx < 0 ? 1 : -1);               // balayage horizontal = image suivante / précédente
+  } else if (tap) {
+    const now = Date.now();
+    if (now - lastTap.t < 320 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 30) {
+      lbZoom(s > 1 ? 1 : 2.5, e.clientX, e.clientY, true);  // double clic / double tap
+      lastTap.t = 0;
+    } else {
+      lastTap = { t: now, x: e.clientX, y: e.clientY };
+      if (e.target === lbStage) closeLB();  // tap sur le fond noir = fermer
+    }
+  }
+  g = null;
+};
+lbStage.addEventListener("pointerup", lbUp);
+lbStage.addEventListener("pointercancel", lbUp);
+addEventListener("resize", () => { if (lbOpen) { lbClamp(); lbApply(); } });
 
 // curseur personnalisé : croix verticale/horizontale
 if (matchMedia("(hover: hover) and (pointer: fine)").matches) {

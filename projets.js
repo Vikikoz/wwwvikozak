@@ -36,7 +36,14 @@ const projects = [
       "img/projet-02/02.jpg",
     ],
   },
-  { title: "Projet 03", cat: "Branding",     year: "2024", images: [] },
+  {
+    title: "Projet 03",
+    cat: "Branding",
+    year: "2024",
+    images: [
+      "img/projet-03/01.jpg",
+    ],
+  },
   { title: "Projet 04", cat: "Web design",   year: "2024", images: [] },
   { title: "Projet 05", cat: "Photographie", year: "2023", images: [] },
   { title: "Projet 06", cat: "SIG",          year: "2023", images: [] },

@@ -102,7 +102,7 @@ Limite : la galerie n'a pas de scroll. Au-delà d'environ 60 images, les vignett
 |---|---|
 | Vitesse du défilement automatique | `script.js` : `AUTO_MS` (en millisecondes, 5000 = 5 s) |
 | Taille des textes | `style.css` : `font-size` du `body`, `.credit` pour « Conçu par » |
-| Numéro de téléphone, email, Instagram | `index.html` : bloc `contact__list` (remplace `+33600000000` et `https://instagram.com/`) |
+| Numéro de téléphone, email, Instagram | `index.html` : bloc `contact__list` (téléphone, email, Instagram) |
 | Nom en haut à gauche | `index.html` : `<span class="brand">` |
 | Couleurs | `style.css` : variables `--bg`, `--ink`, `--mute` en haut du fichier |
 

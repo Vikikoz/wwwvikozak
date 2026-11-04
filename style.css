@@ -45,6 +45,12 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
 .bar--top { justify-content: space-between; }
 .contact { text-align: right; display: grid; gap: 6px; }
 .contact__title { text-decoration: underline; text-underline-offset: 3px; }
+/* Instagram : affiche « Instagram », puis « @vikazok » au survol */
+.swap-link { display: inline-grid; justify-items: end; }
+.swap-link span { grid-area: 1 / 1; transition: opacity .25s; }
+.swap-link span:last-child { opacity: 0; }
+.swap-link:hover span:first-child, .swap-link:focus-visible span:first-child { opacity: 0; }
+.swap-link:hover span:last-child, .swap-link:focus-visible span:last-child { opacity: 1; }
 .contact__list { list-style: none; display: grid; gap: 4px; white-space: nowrap; }
 .brand { position: static; }
 .credit { font-size: 12px; }
@@ -265,15 +271,15 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
     margin-top: -10px;
   }
   .stage::before { margin-top: -10px; }
-  .plist, .num { display: none; }
+  .plist, .num, .nav { display: none; }
   /* bascule List / Gallery : centrée en bas, au-dessus des crédits */
   .viewtog {
     top: auto; right: auto; left: 50%;
-    bottom: calc(var(--pad) + 34px);
+    bottom: calc(var(--pad) + 58px);
     transform: translateX(-50%);
   }
   .caption, .meta {
-    display: grid;
+    display: none;
     left: 50%; top: auto; width: auto;
     white-space: nowrap; text-align: center;
     transform: translateX(-50%);

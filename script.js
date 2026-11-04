@@ -1,5 +1,10 @@
 // Logique du carrousel. Les projets sont définis dans projets.js.
 
+// ignore les projets sans image
+for (let i = projects.length - 1; i >= 0; i--) {
+  if (!projects[i].images.length) projects.splice(i, 1);
+}
+
 // liste à plat de toutes les images (ordre du carrousel / de la galerie)
 const images = projects.flatMap((p, pi) => p.images.map(img => ({ p: pi, img })));
 // index de la première image de chaque projet

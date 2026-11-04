@@ -25,35 +25,9 @@ wwwvikozak/
 - Nom : minuscules, sans espaces ni accents, numérotées sur deux chiffres : `01.jpg`, `02.jpg`…
 - Respecte exactement le nom et la casse écrits dans `projets.js` (`01.JPG` ≠ `01.jpg`).
 
-## Remplacer les données de test par tes vrais projets
+## Projets vides
 
-Au départ, `projets.js` contient 7 projets de test (images générées).
-1. Dans `projets.js`, supprime tout ce qui se trouve entre `DONNÉES DE TEST` et `FIN DES DONNÉES DE TEST`.
-2. Colle à la place la liste ci-dessous et adapte-la.
-
-```js
-const projects = [
-  {
-    title: "Nom du projet 1",
-    cat: "Photographie",
-    year: "2025",
-    images: [
-      "img/projet-01/01.jpg",
-      "img/projet-01/02.jpg",
-      "img/projet-01/03.jpg",
-    ],
-  },
-  {
-    title: "Nom du projet 2",
-    cat: "Cartographie",
-    year: "2024",
-    images: [
-      "img/projet-02/01.jpg",
-      "img/projet-02/02.jpg",
-    ],
-  },
-];
-```
+Un projet dont `images: []` est vide est ignoré (il n'apparaît pas sur le site). Tu peux donc garder des blocs prêts et ajouter les chemins des images quand elles sont là.
 
 ## Templates à copier-coller
 

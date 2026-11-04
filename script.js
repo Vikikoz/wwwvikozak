@@ -263,10 +263,6 @@ function lbLoad() {
   $("lbCount").textContent = `${projects[im.p].title} — ${pad(lbIdx + 1)}/${pad(images.length)}`;
   const next = new Image(); next.src = images[(lbIdx + 1) % images.length].img; // précharge
 }
-function lbNav(d) {
-  lbIdx = (lbIdx + d + images.length) % images.length;
-  lbLoad();
-}
 function openLB(i) {
   lbOpen = true;
   clearInterval(timer);
@@ -284,11 +280,6 @@ function closeLB() {
 }
 
 $("lbClose").onclick = closeLB;
-$("lbPrev").onclick = () => lbNav(-1);
-$("lbNext").onclick = () => lbNav(1);
-$("lbIn").onclick = () => lbZoom(s * 1.6, ...lbCenter(), true);
-$("lbOut").onclick = () => lbZoom(s / 1.6, ...lbCenter(), true);
-$("lbReset").onclick = () => lbZoom(1, ...lbCenter(), true);
 
 // molette = zoom
 lbStage.addEventListener("wheel", e => {
@@ -300,14 +291,12 @@ lbStage.addEventListener("wheel", e => {
 addEventListener("keydown", e => {
   if (!lbOpen) return;
   if (e.key === "Escape") closeLB();
-  else if (e.key === "ArrowRight") lbNav(1);
-  else if (e.key === "ArrowLeft") lbNav(-1);
   else if (e.key === "+" || e.key === "=") lbZoom(s * 1.4, ...lbCenter(), true);
   else if (e.key === "-") lbZoom(s / 1.4, ...lbCenter(), true);
   else if (e.key === "0") lbZoom(1, ...lbCenter(), true);
 });
 
-// souris / doigts : déplacer (zoomé), balayer (non zoomé), pincer, double-tap
+// souris / doigts : déplacer (zoomé), pincer, double-tap
 const pts = new Map();
 let g = null, pinch = null, pinched = false, lastTap = { t: 0, x: 0, y: 0 };
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -342,11 +331,8 @@ const lbUp = e => {
   pinch = null;
   if (pinched) { pinched = false; g = null; return; }
   if (!g) return;
-  const dx = e.clientX - g.x, dy = e.clientY - g.y;
-  const tap = Math.hypot(dx, dy) < 8 && Date.now() - g.t < 400;
-  if (s <= 1 && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-    lbNav(dx < 0 ? 1 : -1);               // balayage horizontal = image suivante / précédente
-  } else if (tap) {
+  const tap = Math.hypot(e.clientX - g.x, e.clientY - g.y) < 8 && Date.now() - g.t < 400;
+  if (tap) {
     const now = Date.now();
     if (now - lastTap.t < 320 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 30) {
       lbZoom(s > 1 ? 1 : 2.5, e.clientX, e.clientY, true);  // double clic / double tap

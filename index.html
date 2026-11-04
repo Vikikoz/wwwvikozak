@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Viktor Kozak — Portfolio</title>
+  <meta name="description" content="Portfolio de Viktor Kozak — carrousel de projets.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="bar bar--top">
+    <span class="brand">Viktor Kozak</span>
+    <div class="contact">
+      <span class="contact__title">Contact</span>
+      <ul class="contact__list">
+        <!-- TODO : remplace le numéro et le compte Instagram -->
+        <li><a class="link" href="tel:+33600000000">+33 6 00 00 00 00</a></li>
+        <li><a class="link" href="mailto:vkzk204@gmail.com">vkzk204@gmail.com</a></li>
+        <li><a class="link" href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- gauche : liste des projets (actif en gras) -->
+  <nav class="plist" id="plist" aria-label="Projets"></nav>
+
+  <!-- droite : bascule LIST / GALLERY -->
+  <div class="viewtog" role="group" aria-label="Affichage">
+    <button type="button" class="on" data-view="list">List</button>
+    <button type="button" data-view="gallery">Gallery</button>
+  </div>
+
+  <div class="gallery" id="gallery"></div>
+
+  <main class="stage" aria-roledescription="carrousel" aria-label="Projets">
+    <ul class="track" id="track"></ul>
+
+    <div class="caption">
+      <span class="count" id="count">01/06</span>
+      <h1 class="title" id="title"></h1>
+    </div>
+    <span class="num" id="num"></span>
+    <div class="meta">
+      <span class="cat" id="cat"></span>
+      <span class="year" id="year"></span>
+    </div>
+  </main>
+
+  <footer class="bar bar--bottom">
+    <span class="credit">Conçu par <u>Viktor Kozak</u></span>
+    <span class="hint">← → / molette / glisser</span>
+    <span class="nav">
+      <button class="arrow" id="prev" aria-label="Précédent">←</button>
+      <button class="arrow" id="next" aria-label="Suivant">→</button>
+    </span>
+  </footer>
+
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+  <script src="projets.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

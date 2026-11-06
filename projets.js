@@ -18,34 +18,69 @@
 
 const projects = [
   {
-    title: "Projet 01",
+    title: "Motorcycle",
+    cat: "MOTORCYCLE",
+    year: "2026",
+    images: [
+      "img/projet-10/01.jpg",
+      "img/projet-10/02.jpg",
+    ],
+  },
+  {
+    title: "Church",
+    cat: "CHURCH",
+    year: "2026",
+    images: [
+      "img/projet-11/01.jpg",
+      "img/projet-11/02.jpg",
+      "img/projet-11/03.jpg",
+    ],
+  },
+  {
+    title: "Polish Winter",
+    cat: "POLISH WINTER",
+    year: "2026",
+    images: [
+      "img/projet-09/01.jpg",
+    ],
+  },
+  {
+    title: "New Year",
     cat: "Photographie",
-    year: "2025",
+    year: "2026",
     images: [
-      "img/projet-01/01.jpg",
-      "img/projet-01/02.jpg",
-      "img/projet-01/03.jpg",
+      "img/projet-08/01.jpg",
+      "img/projet-08/02.jpg",
+      "img/projet-08/03.jpg",
+      "img/projet-08/04.jpg",
     ],
   },
   {
-    title: "Projet 02",
-    cat: "Cartographie",
-    year: "2025",
+    title: "Polish Countryside",
+    cat: "POLISH COUNTRYSIDE",
+    year: "2026",
     images: [
-      "img/projet-02/01.jpg",
-      "img/projet-02/02.jpg",
+      "img/projet-12/01.jpg",
+      "img/projet-12/02.jpg",
+      "img/projet-12/03.jpg",
     ],
   },
   {
-    title: "Projet 03",
-    cat: "Branding",
-    year: "2024",
+    title: "Animals",
+    cat: "ANIMALS",
+    year: "2026",
     images: [
-      "img/projet-03/01.jpg",
+      "img/projet-13/01.jpg",
+      "img/projet-13/02.jpg",
     ],
   },
-  { title: "Projet 04", cat: "Web design",   year: "2024", images: [] },
-  { title: "Projet 05", cat: "Photographie", year: "2023", images: [] },
-  { title: "Projet 06", cat: "SIG",          year: "2023", images: [] },
-  { title: "Projet 07", cat: "Photographie", year: "2023", images: [] },
+  {
+    title: "Mood",
+    cat: "MOOD",
+    year: "2026",
+    images: [
+      "img/projet-14/01.jpg",
+      "img/projet-14/02.jpg",
+    ],
+  },
 ];

@@ -28,11 +28,33 @@ body {
   -webkit-font-smoothing: antialiased;
   touch-action: pan-y;
   user-select: none;
+  -webkit-touch-callout: none;   /* pas de menu d'appui long sur iOS */
 }
+img { -webkit-user-drag: none; user-select: none; }
 
 a, button { color: inherit; font: inherit; text-transform: inherit; letter-spacing: inherit; }
 .link { text-decoration: none; }
 .link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* fond : grand mot STUDIO, pleine largeur, collé en bas */
+.bgword {
+  position: fixed; left: 0; bottom: 0; z-index: 0;
+  width: 100%; height: auto; aspect-ratio: 600 / 118; overflow: visible;
+  pointer-events: none;
+}
+.bgword text {
+  font-family: "Space Mono", var(--font);
+  font-weight: 700;
+  font-size: 140px;
+  fill: #f6f6f6;
+}
+
+/* fond : grille de « + » classiques */
+body, .gallery {
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='112'%3E%3Cpath d='M56 50v12M50 56h12' stroke='%23ececec' stroke-width='1' fill='none' shape-rendering='crispEdges'/%3E%3C/svg%3E");
+  background-position: center;
+}
 
 /* barres haut / bas */
 .bar {
@@ -54,10 +76,6 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
 .contact__list { list-style: none; display: grid; gap: 4px; white-space: nowrap; }
 .brand { position: static; }
 .credit { font-size: 12px; }
-.hint { color: var(--mute); position: absolute; left: 50%; transform: translateX(-50%); bottom: var(--pad); }
-.nav { display: flex; gap: 14px; }
-.arrow { background: none; border: 0; cursor: pointer; padding: 2px 4px; }
-.arrow:hover { opacity: .5; }
 
 /* repères d'angle : statiques au repos, animés uniquement lors d'un changement d'image */
 @property --l { syntax: "<length>"; inherits: false; initial-value: 14px; }
@@ -96,21 +114,24 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
   flex: 0 0 auto;
   aspect-ratio: 4 / 3;
   width: calc(var(--w) * .26);
-  background: var(--tile);
+  /* fond opaque : les « + » du fond ne transparaissent jamais à travers les photos */
+  background: color-mix(in srgb, var(--tile) 55%, #fff);
   position: relative;
   cursor: pointer;
-  opacity: .55;
   filter: grayscale(1);
-  transition: width .7s cubic-bezier(.65, 0, .25, 1), opacity .5s, filter .5s;
+  transition: width .7s cubic-bezier(.65, 0, .25, 1), background-color .5s, filter .5s;
   overflow: hidden;
 }
-.slide:hover { opacity: .85; }
+/* le grisé s'applique au contenu (pas à la vignette) pour rester opaque */
+.slide > img, .slide > .ph { opacity: .55; transition: opacity .5s; }
+.slide:hover > img, .slide:hover > .ph { opacity: .85; }
 .slide.is-active {
   width: var(--w);
-  opacity: 1;
+  background: var(--tile);
   filter: none;
   cursor: default;
 }
+.slide.is-active > img, .slide.is-active > .ph { opacity: 1; }
 .slide img {
   width: 100%; height: 100%;
   object-fit: cover; display: block;
@@ -198,7 +219,7 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
 /* vue galerie : grille fixe, sans scroll */
 .gallery {
   position: fixed; inset: 0; z-index: 4;
-  background: var(--bg);
+  background-color: var(--bg);   /* + le motif de « + » partagé avec body (voir plus haut) */
   display: grid; place-items: center;
   opacity: 0; visibility: hidden; pointer-events: none;
   transition: opacity .6s ease, visibility 0s linear .6s;
@@ -238,12 +259,25 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
 .gallery .slide {
   width: 100%; opacity: 1; filter: none; cursor: pointer;
 }
+.gallery .slide { background: var(--tile); }
+.gallery .slide > img, .gallery .slide > .ph { opacity: 1; }
 .gallery .slide:hover { opacity: .7; }
 .count, .year { color: var(--mute); }
 .title { font: inherit; font-weight: 500; }
 
 .caption > *, .meta > * { transition: opacity .3s; }
-.swap .caption > *, .swap .meta > * { opacity: 0; }
+.swap .caption > *:not(.count), .swap .meta > * { opacity: 0; }
+
+/* compteur odomètre */
+.count, .num { line-height: 1.2em; }
+.reel { display: inline-block; overflow: hidden; height: 1.2em; vertical-align: top; }
+.reel__strip {
+  display: flex; flex-direction: column;
+  transition: transform .6s cubic-bezier(.22, 1, .36, 1);
+  will-change: transform;
+}
+.reel__strip > span { display: block; height: 1.2em; line-height: 1.2em; }
+@media (prefers-reduced-motion: reduce) { .reel__strip { transition: none; } }
 
 /* numéro du projet : à droite de l'image active, centré en hauteur sur l'image (PC) */
 .num {
@@ -252,9 +286,7 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
   top: 50%;
   transform: translateY(-50%);
   color: var(--mute);
-  transition: opacity .3s;
 }
-.swap .num { opacity: 0; }
 
 
 
@@ -271,7 +303,7 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
     margin-top: -10px;
   }
   .stage::before { margin-top: -10px; }
-  .plist, .num, .nav { display: none; }
+  .plist, .num { display: none; }
   /* bascule List / Gallery : centrée en bas, au-dessus des crédits */
   .viewtog {
     top: auto; right: auto; left: 50%;
@@ -286,7 +318,6 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
   }
   .caption { bottom: calc(50% + var(--w) * 3 / 8 + 44px); }
   .meta { top: calc(50% + var(--w) * 3 / 8 + 40px); }
-  .hint { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .stage.pulse::before, .gal-frame.pulse { animation: none; }
@@ -357,6 +388,15 @@ a, button { color: inherit; font: inherit; text-transform: inherit; letter-spaci
   transition: opacity .2s;
 }
 .lb__btn:hover { opacity: .55; }
+/* flèches de navigation dans la visionneuse */
+.lb__nav {
+  position: absolute; z-index: 3; top: 50%;
+  transform: translateY(-50%);
+  font-size: 28px; line-height: 1;
+  padding: 18px 20px;
+}
+.lb__nav--prev { left: calc(var(--pad) - 10px); }
+.lb__nav--next { right: calc(var(--pad) - 10px); }
 .lb__top .lb__btn { margin: -10px -10px 0 0; }
 .slide.is-active { cursor: zoom-in; }
 @media (max-width: 720px) {

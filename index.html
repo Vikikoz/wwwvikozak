@@ -11,6 +11,10 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- fond : mot STUDIO sur toute la largeur, en bas -->
+  <svg class="bgword" viewBox="0 -14 600 118" preserveAspectRatio="none" aria-hidden="true">
+    <text x="0" y="100" textLength="600" lengthAdjust="spacingAndGlyphs">STUDIO</text>
+  </svg>
   <header class="bar bar--top">
     <span class="brand">Viktor Kozak</span>
     <div class="contact">
@@ -32,7 +36,11 @@
     <button type="button" data-view="gallery">Gallery</button>
   </div>
 
-  <div class="gallery" id="gallery"></div>
+  <div class="gallery" id="gallery">
+    <svg class="bgword" viewBox="0 -14 600 118" preserveAspectRatio="none" aria-hidden="true">
+      <text x="0" y="100" textLength="600" lengthAdjust="spacingAndGlyphs">STUDIO</text>
+    </svg>
+  </div>
 
   <main class="stage" aria-roledescription="carrousel" aria-label="Projets">
     <ul class="track" id="track"></ul>
@@ -49,12 +57,7 @@
   </main>
 
   <footer class="bar bar--bottom">
-    <span class="credit">Conçu par <u>Viktor Kozak</u></span>
-    <span class="hint">← → / molette / glisser</span>
-    <span class="nav">
-      <button class="arrow" id="prev" aria-label="Précédent">←</button>
-      <button class="arrow" id="next" aria-label="Suivant">→</button>
-    </span>
+    <span class="credit">© 2026 Viktor Kozak — Tous droits réservés</span>
   </footer>
 
   <!-- visionneuse plein écran (clic sur une photo en vue List) -->
@@ -64,6 +67,8 @@
       <button type="button" class="lb__btn" id="lbClose" aria-label="Fermer">Fermer ✕</button>
     </div>
     <div class="lb__stage" id="lbStage"><img id="lbImg" alt="" draggable="false"></div>
+    <button type="button" class="lb__btn lb__nav lb__nav--prev" id="lbPrev" aria-label="Image précédente">←</button>
+    <button type="button" class="lb__btn lb__nav lb__nav--next" id="lbNext" aria-label="Image suivante">→</button>
   </div>
 
   <div class="cursor" id="cursor" aria-hidden="true"></div>

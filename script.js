@@ -57,8 +57,6 @@ function layout(animate = true) {
   track.style.transform = vertical
     ? `translate3d(-50%,${offset}px,0)`
     : `translate3d(${offset}px,-50%,0)`;
-  $("prev").textContent = vertical ? "↑" : "←";
-  $("next").textContent = vertical ? "↓" : "→";
   if (!animate) requestAnimationFrame(() => (track.style.transition = ""));
   slides.forEach((s, i) => s.classList.toggle("is-active", i === active));
 }
@@ -86,7 +84,7 @@ images.forEach((im, i) => {
   t.innerHTML = im.img
     ? `<img src="${im.img}" alt="${p.title}" draggable="false">`
     : `<span class="ph">${pad(i + 1)}</span>`;
-  t.onclick = () => { go(i); setView("list"); };
+  t.onclick = () => { go(i); openLB(i); }; // reste en vue Gallery : ouvre la visionneuse
   grid.appendChild(t);
 });
 const frame = document.createElement("div");
@@ -130,13 +128,62 @@ function setView(v) {
 }
 toggles.forEach(b => (b.onclick = () => setView(b.dataset.view)));
 
+// compteur : chaque chiffre qui change défile verticalement (odomètre)
+// bande verticale 01…N construite une fois ; on la fait glisser jusqu'au bon numéro
+// deux bandes indépendantes : dizaines (0,1,…) et unités (1,2,…,9,0,1,…)
+// → le chiffre des dizaines ne bouge que lorsqu'il change vraiment
+function makeReel(values) {
+  const win = document.createElement("span");
+  win.className = "reel";
+  win.setAttribute("aria-hidden", "true");
+  const strip = document.createElement("span");
+  strip.className = "reel__strip";
+  values.forEach(v => {
+    const s = document.createElement("span");
+    s.textContent = v;
+    strip.appendChild(s);
+  });
+  win.appendChild(strip);
+  return { win, strip };
+}
+
+function buildReel(el) {
+  const n = images.length;
+  el.textContent = "";
+  const tens = makeReel(Array.from({ length: Math.floor(n / 10) + 1 }, (_, k) => k));
+  const units = makeReel(Array.from({ length: n }, (_, k) => (k + 1) % 10));
+  el.append(tens.win, units.win, "/" + pad(n));
+  el._tens = tens.strip;
+  el._units = units.strip;
+}
+
+function setReel(el, index) {
+  const num = index + 1;
+  el._tens.style.transform = `translateY(${-Math.floor(num / 10) * 1.2}em)`;
+  el._units.style.transform = `translateY(${-index * 1.2}em)`;
+}
+
+function roll(el, index) {
+  if (!el._units) {
+    buildReel(el);
+    const strips = [el._tens, el._units];
+    strips.forEach(s => (s.style.transition = "none")); // 1er affichage : pas d'animation
+    setReel(el, index);
+    void el.offsetWidth;
+    strips.forEach(s => (s.style.transition = ""));
+  } else {
+    setReel(el, index);
+  }
+  el.setAttribute("aria-label", `${pad(index + 1)}/${pad(images.length)}`);
+}
+
 function caption() {
   const p = projects[images[active].p];
   items.forEach((b, i) => b.classList.toggle("on", i === images[active].p));
+  roll($("count"), active);
+  roll($("num"), active);
   document.body.classList.add("swap");
   setTimeout(() => {
-    $("count").textContent = `${pad(active + 1)}/${pad(images.length)}`;
-    $("num").textContent = `${pad(active + 1)}/${pad(images.length)}`;
     $("title").textContent = p.title;
     $("cat").textContent = p.cat;
     $("year").textContent = p.year;
@@ -180,8 +227,6 @@ addEventListener("keydown", e => {
   if (e.key === "ArrowRight" || e.key === "ArrowDown") go(active + 1);
   if (e.key === "ArrowLeft" || e.key === "ArrowUp") go(active - 1);
 });
-$("next").onclick = () => go(active + 1);
-$("prev").onclick = () => go(active - 1);
 
 // molette (verticale ou horizontale → navigation), verrouillée le temps de la transition
 let lock = false;
@@ -281,18 +326,33 @@ function closeLB() {
 
 $("lbClose").onclick = closeLB;
 
+// navigation dans la visionneuse (boucle)
+function lbGo(d) {
+  const n = images.length;
+  lbIdx = (((lbIdx + d) % n) + n) % n;
+  lbLoad();
+}
+$("lbPrev").onclick = () => lbGo(-1);
+$("lbNext").onclick = () => lbGo(1);
+
 // molette = zoom
 lbStage.addEventListener("wheel", e => {
   e.preventDefault();
-  lbZoom(s * Math.exp(-e.deltaY * 0.0018), e.clientX, e.clientY);
+  // normalise (lignes → pixels), plafonne un cran de molette, puis zoom exponentiel plus vif
+  let dy = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+  dy = clampN(dy, -150, 150);
+  const speed = e.ctrlKey ? 0.01 : 0.0035; // pincement pavé tactile : deltas plus petits
+  lbZoom(s * Math.exp(-dy * speed), e.clientX, e.clientY);
 }, { passive: false });
 
 // clavier
 addEventListener("keydown", e => {
   if (!lbOpen) return;
   if (e.key === "Escape") closeLB();
-  else if (e.key === "+" || e.key === "=") lbZoom(s * 1.4, ...lbCenter(), true);
-  else if (e.key === "-") lbZoom(s / 1.4, ...lbCenter(), true);
+  else if (e.key === "ArrowRight" || e.key === "ArrowDown") lbGo(1);
+  else if (e.key === "ArrowLeft" || e.key === "ArrowUp") lbGo(-1);
+  else if (e.key === "+" || e.key === "=") lbZoom(s * 1.6, ...lbCenter(), true);
+  else if (e.key === "-") lbZoom(s / 1.6, ...lbCenter(), true);
   else if (e.key === "0") lbZoom(1, ...lbCenter(), true);
 });
 
@@ -331,7 +391,14 @@ const lbUp = e => {
   pinch = null;
   if (pinched) { pinched = false; g = null; return; }
   if (!g) return;
-  const tap = Math.hypot(e.clientX - g.x, e.clientY - g.y) < 8 && Date.now() - g.t < 400;
+  // balayage horizontal (image non zoomée) = image précédente / suivante
+  const dx = e.clientX - g.x, dyy = e.clientY - g.y;
+  if (s <= 1 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dyy) * 1.5) {
+    lbGo(dx < 0 ? 1 : -1);
+    g = null;
+    return;
+  }
+  const tap =Math.hypot(e.clientX - g.x, e.clientY - g.y) < 8 && Date.now() - g.t < 400;
   if (tap) {
     const now = Date.now();
     if (now - lastTap.t < 320 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 30) {
@@ -358,3 +425,7 @@ if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
   });
   document.addEventListener("pointerleave", () => cur.classList.remove("on"));
 }
+
+// pas de menu clic droit (ouvrir l'image dans un nouvel onglet, etc.) et pas de glisser-déposer d'image
+addEventListener("contextmenu", e => e.preventDefault());
+addEventListener("dragstart", e => e.preventDefault());

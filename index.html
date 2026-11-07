@@ -3,8 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Viktor Kozak — Portfolio</title>
-  <meta name="description" content="Portfolio de Viktor Kozak — carrousel de projets.">
+  <title>Viktor Kozak — Photographe</title>
+  <meta name="description" content="Viktor Kozak, photographe — moto, hiver polonais, campagne, animaux et architecture. Portfolio et contact.">
+  <meta name="color-scheme" content="light only">
+  <meta property="og:title" content="Viktor Kozak — Photographe">
+  <meta property="og:description" content="Viktor Kozak, photographe — moto, hiver polonais, campagne, animaux et architecture.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
@@ -12,7 +15,7 @@
 </head>
 <body>
   <!-- fond : mot STUDIO sur toute la largeur, en bas -->
-  <svg class="bgword" viewBox="0 -14 600 118" preserveAspectRatio="none" aria-hidden="true">
+  <svg class="bgword" fill="#f6f6f6" viewBox="0 -14 600 118" preserveAspectRatio="none" aria-hidden="true">
     <text x="0" y="100" textLength="600" lengthAdjust="spacingAndGlyphs">STUDIO</text>
   </svg>
   <header class="bar bar--top">
@@ -37,7 +40,7 @@
   </div>
 
   <div class="gallery" id="gallery">
-    <svg class="bgword" viewBox="0 -14 600 118" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="bgword" fill="#f6f6f6" viewBox="0 -14 600 118" preserveAspectRatio="none" aria-hidden="true">
       <text x="0" y="100" textLength="600" lengthAdjust="spacingAndGlyphs">STUDIO</text>
     </svg>
   </div>
@@ -67,8 +70,8 @@
       <button type="button" class="lb__btn" id="lbClose" aria-label="Fermer">Fermer ✕</button>
     </div>
     <div class="lb__stage" id="lbStage"><img id="lbImg" alt="" draggable="false"></div>
-    <button type="button" class="lb__btn lb__nav lb__nav--prev" id="lbPrev" aria-label="Image précédente">←</button>
-    <button type="button" class="lb__btn lb__nav lb__nav--next" id="lbNext" aria-label="Image suivante">→</button>
+    <button type="button" class="lb__btn lb__nav lb__nav--prev" id="lbPrev" aria-label="Image précédente"><svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M21 12H3M9.5 5.5 3 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg></button>
+    <button type="button" class="lb__btn lb__nav lb__nav--next" id="lbNext" aria-label="Image suivante"><svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M3 12h18M14.5 5.5 21 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg></button>
   </div>
 
   <div class="cursor" id="cursor" aria-hidden="true"></div>

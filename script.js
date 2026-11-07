@@ -96,8 +96,20 @@ gallery.appendChild(grid);
 // dimensionne la grille pour que TOUTES les vignettes tiennent à l'écran (sans scroll)
 function fitGallery() {
   const n = images.length, gap = 18, mobile = mobileMQ.matches;
-  const AW = innerWidth * (mobile ? 0.88 : 0.6);
-  const AH = innerHeight - (mobile ? 200 : 238);
+  let AW, AH;
+  if (mobile) {
+    // zone libre = entre le bandeau haut (contact) et la bascule List/Gallery
+    const top = document.querySelector(".bar--top").getBoundingClientRect().bottom + 12;
+    const bottom = innerHeight - document.querySelector(".viewtog").getBoundingClientRect().top + 16;
+    gallery.style.paddingTop = top + "px";
+    gallery.style.paddingBottom = bottom + "px";
+    AW = innerWidth * 0.84;
+    AH = innerHeight - top - bottom - 24; // 24 = marge des repères d'angle
+  } else {
+    gallery.style.paddingTop = gallery.style.paddingBottom = "";
+    AW = innerWidth * 0.6;
+    AH = innerHeight - 238;
+  }
   let best = { s: 0, c: 1 };
   for (let c = 1; c <= n; c++) {
     const rows = Math.ceil(n / c);

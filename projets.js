@@ -75,8 +75,8 @@ const projects = [
     ],
   },
   {
-    title: "Mood",
-    cat: "MOOD",
+    title: "Projet 00",
+    cat: "PROJET 00",
     year: "2026",
     images: [
       "img/projet-14/01.jpg",
